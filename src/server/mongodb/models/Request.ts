@@ -1,32 +1,42 @@
-import mongoose, { HydratedDocument, InferSchemaType, Model, Schema, model, models } from "mongoose";
+import mongoose, {
+    HydratedDocument,
+    InferSchemaType,
+    Model,
+    Schema,
+    model,
+    models,
+} from 'mongoose';
 
 const requestSchema = new Schema({
-	requestorName: {
-		type: String,
-		required: true,
-	},
+    requestorName: {
+        type: String,
+        required: 'requestor name is required',
+    },
     itemRequested: {
         type: String,
-        required: true,
+        required: 'item requested is required',
     },
-    createdDate: {
+    requestCreatedDate: {
         type: Date,
-        default: Date.now(),
-        required: true,
-    }, 
+        required: 'created date is required', // note: client code must add createdDate timestamp to request data
+    },
     lastEditedDate: {
         type: Date,
-        required: false
+        default: Date.now(),
+        required: false,
     },
     status: {
         type: String,
-        enum: ['PENDING', 'COMPLETED', 'APPROVED', 'REJECTED'],
-        required: true
-
-    }
+        enum: {
+            values: ['pending', 'completed', 'approved', 'rejected'],
+            message: '{VALUE} is not supported',
+        },
+        required: true,
+    },
 });
 
-export const Request: Model<InferSchemaType<typeof requestSchema>> = models.request ?? model('request', requestSchema);
+export const Request: Model<InferSchemaType<typeof requestSchema>> =
+    models.request ?? model('request', requestSchema);
 
 /**
  * Extracts the “plain” shape of your schema—
