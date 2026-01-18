@@ -1,5 +1,4 @@
 import { HTTP_STATUS_CODE, ResponseType } from '@/lib/types/apiResponse';
-import { editMockStatusRequest } from '@/server/mock/requests';
 import { ServerResponseBuilder } from '@/lib/builders/serverResponseBuilder';
 import { InputException } from '@/lib/errors/inputExceptions';
 import createRequest from '@/server/mongodb/actions/createItemRequest';
@@ -19,14 +18,11 @@ export async function GET(request: Request) {
         status &&
         !Object.values(RequestStatus).includes(status as RequestStatus)
     ) {
-        return new Response(
-            JSON.stringify({
-                messge: `status must be one of ${
-                    Object.values(RequestStatus).toString
-                }`,
-            }),
-            { status: HTTP_STATUS_CODE.BAD_REQUEST }
-        );
+        return new ServerResponseBuilder(ResponseType.INVALID_INPUT)
+            .setMessage(
+                `status must be one of ${Object.values(RequestStatus).toString()}`
+            )
+            .build();
     }
 
     try {
@@ -35,20 +31,19 @@ export async function GET(request: Request) {
         if (!(result instanceof Error)) {
             const { items, totItems } = result;
             // handle cursor out of bounds
-            if (items.length == 0 && page > 0) {
-                return new Response(
-                    JSON.stringify({
-                        message: `page ${page} is out of bounds`,
-                    }),
-                    { status: HTTP_STATUS_CODE.BAD_REQUEST }
-                );
+            if (items.length == 0 && page > 1) {
+                return new ServerResponseBuilder(ResponseType.INVALID_INPUT)
+                    .setMessage(`page ${page} is out of bounds`)
+                    .build();
             } else {
                 return new Response(
                     JSON.stringify({
                         data: items,
-                        first: encodeURI(`/request?status=${status}&page=${0}`),
+                        first: encodeURI(
+                            `/api/request?status=${status}&page=1`
+                        ),
                         last: encodeURI(
-                            `/request?status=${status}&page=${Math.ceil(totItems / PAGINATION_PAGE_SIZE)}`
+                            `/api/request?status=${status}&page=${Math.max(1, Math.ceil(totItems / PAGINATION_PAGE_SIZE))}`
                         ),
                     }),
                     {
@@ -58,9 +53,9 @@ export async function GET(request: Request) {
                 );
             }
         } else {
-            return new ServerResponseBuilder(
-                ResponseType.UNKNOWN_ERROR
-            ).build();
+            return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR)
+                .setMessage(result.message)
+                .build();
         }
     } catch (e) {
         if (e instanceof InputException) {
@@ -68,6 +63,8 @@ export async function GET(request: Request) {
                 ResponseType.INVALID_INPUT
             ).build();
         }
+        console.error(e);
+
         return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR).build();
     }
 }
@@ -77,15 +74,14 @@ export async function PUT(request: Request) {
         const data = await request.json();
 
         // set the createdDate to today and set the status to pending
-        data.createdDate = new Date();
+        data.requestCreatedDate = new Date();
         data.status = RequestStatus.PENDING;
         const newRequest = await createRequest(data);
 
         if (newRequest instanceof Error.ValidationError) {
-            return new Response(JSON.stringify(newRequest.errors), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return new ServerResponseBuilder(ResponseType.INVALID_INPUT)
+                .setMessage(JSON.stringify(newRequest.errors))
+                .build();
         }
 
         return new ServerResponseBuilder(ResponseType.CREATED).build();
@@ -102,15 +98,20 @@ export async function PUT(request: Request) {
 export async function PATCH(request: Request) {
     try {
         const data = await request.json();
-
+        if (!data.id) {
+            return new ServerResponseBuilder(ResponseType.INVALID_INPUT)
+                .setMessage('ID is missing from payload')
+                .build();
+        }
         // set the createdDate to today and set the status to pending
+        data._id = data.id;
+        delete data.id;
         data.lastEditedDate = new Date();
         const updatedRequest = await updateItemRequest(data);
         if (updatedRequest instanceof Error.ValidationError) {
-            return new Response(JSON.stringify(updatedRequest.errors), {
-                status: HTTP_STATUS_CODE.BAD_REQUEST,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return new ServerResponseBuilder(ResponseType.INVALID_INPUT)
+                .setMessage(JSON.stringify(updatedRequest.errors))
+                .build();
         }
 
         return new ServerResponseBuilder(ResponseType.SUCCESS).build();
