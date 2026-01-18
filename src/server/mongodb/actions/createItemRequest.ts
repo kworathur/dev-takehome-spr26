@@ -3,7 +3,7 @@ import { Request, RequestDocument, RequestType } from '../models/Request';
 import { Error } from 'mongoose';
 const createRequest = async (
     data: RequestType
-): Promise<RequestDocument | Error.ValidationError | null> => {
+): Promise<RequestDocument | Error> => {
     try {
         await connectDB();
         const newRequest = new Request(data);
@@ -14,8 +14,7 @@ const createRequest = async (
         await newRequest.save();
         return newRequest;
     } catch (err) {
-        console.error(`[ERROR]: Error encountered while creating new request`);
-        return null;
+        throw new Error(`Failed to create new itemRequest`);
     }
 };
 

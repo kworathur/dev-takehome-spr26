@@ -1,0 +1,104 @@
+{
+  "info": {
+    "_postman_id": "d9c4575d-c564-4e36-bf79-5aef88614e24",
+    "name": "BoG S26 TakeHome",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26055940"
+  },
+  "item": [
+    {
+      "name": "Create a new item request",
+      "request": {
+        "method": "PUT",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Update an existing item request",
+      "request": {
+        "method": "PATCH",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "List all item requests (no status filter)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/request?page=3",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "request"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List all item requests - valid status filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/request?status=approved",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "request"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "approved"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List all item requests - invalid status filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/request?status=invalidStatus",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "request"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "invalidStatus"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
