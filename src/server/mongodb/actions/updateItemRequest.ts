@@ -17,11 +17,10 @@ const updateItemRequest = async (
             return new Error(`Item request with id ${data._id} not found`);
         }
 
-        const updatedItem: RequestType = {
-            ...itemRequest,
-            ...data,
-        };
-        const error = new Request(updatedItem).validateSync();
+        const updatedRequest = { ...itemRequest.toObject(), ...data };
+        console.log(updatedRequest);
+
+        const error = new Request(updatedRequest).validateSync();
         if (error) {
             return error;
         }
