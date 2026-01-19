@@ -1,0 +1,109 @@
+openapi: '3.0.3'
+
+info:
+    title: Crisis Corner REST API
+    version: '1.0'
+
+servers:
+    - url: http://localhost:3000
+paths:
+    /api/request:
+        get:
+            summary: Returns a list of item requests
+            parameters:
+                - in: query
+                  name: status
+                  required: false
+                  schema:
+                      type: string
+                      example: pending
+                - in: query
+                  name: page
+                  required: false
+                  schema:
+                      type: integer
+                      format: int64
+                      example: 1
+
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: array
+                                        items:
+                                            $ref: '#/components/schemas/ItemRequest'
+                                    first:
+                                        type: string
+                                        description: URI of first page of results
+                                    last:
+                                        type: string
+                                        description: URI of last page of results
+                '400':
+                    description: Bad request - filter status is invalid or cursor is out of bounds
+                '500':
+                    description: An unknown error occurred
+        put:
+            summary: Creates a new item request
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ItemRequest'
+                        example:
+                            reqestorName: Alice Good
+                            itemRequested: Tarps
+            responses:
+                '201':
+                    description: New item request created successfully
+                '400':
+                    description: Request payload is missing required fields or status is invalid
+        patch:
+            summary: Updates an existing item request
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ItemRequest'
+                        example:
+                            reqestorName: John Doe
+                            itemRequested: Gas Tanks
+                            status: approved
+            responses:
+                '200':
+                    description: Item request update performed successfully
+                '400':
+                    description: Request is invalid due to missing/invalid ID
+components:
+    schemas:
+        ItemRequest:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                    description: The item request ID
+                requestorName:
+                    type: string
+                    description: The requestor name
+                itemRequested:
+                    type: string
+                    description: The item requested for relief
+                requestCreatedDate:
+                    type: string
+                    description: Request created timestamp
+                status:
+                    type: string
+                    description: Status of the request
+                    enum:
+                        - pending
+                        - completed
+                        - approved
+                        - rejected
+                lastEditedDate:
+                    type: string
+                    description: Last time the request was updated

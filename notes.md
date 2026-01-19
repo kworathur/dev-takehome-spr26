@@ -31,4 +31,4 @@
 
 # Notes
 
-<!-- Notes go here -->
+- See `crisis-corner-docs.html` for Crisis Corner HTML API documentation.
