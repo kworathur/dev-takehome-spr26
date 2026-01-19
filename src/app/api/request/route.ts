@@ -1,4 +1,4 @@
-import { HTTP_STATUS_CODE, ResponseType } from '@/lib/types/apiResponse';
+import { ResponseType } from '@/lib/types/apiResponse';
 import { ServerResponseBuilder } from '@/lib/builders/serverResponseBuilder';
 import { InputException } from '@/lib/errors/inputExceptions';
 import createRequest from '@/server/mongodb/actions/createItemRequest';
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
         if (!(result instanceof Error)) {
             const { items, totItems } = result;
             // handle cursor out of bounds
-            if (items.length == 0 && page > 1) {
+            if (page < 1 || (items.length == 0 && page > 1)) {
                 return new ServerResponseBuilder(ResponseType.INVALID_INPUT)
                     .setMessage(`page ${page} is out of bounds`)
                     .build();
