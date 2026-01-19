@@ -18,7 +18,7 @@ const requestSchema = new Schema({
     },
     requestCreatedDate: {
         type: Date,
-        required: 'created date is required', // note: client code must add createdDate timestamp to request data
+        required: 'created date is required', // note: backend logic must add createdDate timestamp to request data
     },
     lastEditedDate: {
         type: Date,

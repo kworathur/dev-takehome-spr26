@@ -1,5 +1,10 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
+/**
+ * Establish a database connection using connection string
+ * read from enviroinment variables
+ * @returns
+ */
 export default async function connectDB() {
     if (mongoose.connections[0].readyState) return;
 
@@ -8,7 +13,7 @@ export default async function connectDB() {
             dbName: process.env.DB_NAME,
         })
         .catch((e) => {
-            console.error("Error connecting to database.");
+            console.error('Error connecting to database.');
             throw e;
         });
-};
+}

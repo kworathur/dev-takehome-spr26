@@ -2,7 +2,11 @@ import connectDB from '..';
 import { Request, RequestDocument, RequestType } from '../models/Request';
 import { Error } from 'mongoose';
 
-// updates data with given _id
+/**
+ * Update item request with new @data
+ * @param data to update the item request with
+ * @returns item request with updated fields
+ */
 const updateItemRequest = async (
     data: Partial<RequestDocument>
 ): Promise<RequestDocument | Error | null> => {
@@ -19,7 +23,8 @@ const updateItemRequest = async (
 
         const updatedRequest = { ...itemRequest.toObject(), ...data };
         console.log(updatedRequest);
-
+        // validate that the new status of the updated request
+        // satisfies enum constraint
         const error = new Request(updatedRequest).validateSync();
         if (error) {
             return error;

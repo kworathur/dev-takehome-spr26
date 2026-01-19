@@ -4,20 +4,27 @@ import { Request, RequestDocument } from '../models/Request';
 import { Error } from 'mongoose';
 import { PAGINATION_PAGE_SIZE } from '@/lib/constants/config';
 
+/**
+ * Return a list of item requests, indexed by @page and
+ * optionally filtered by @filterStatus
+ * @param filterStatus status to filter requests on
+ * @param page the page number to retrieve search results for
+ * @returns paginated list of item requests sorted by creation date in descending order
+ */
 const getItemRequests = async (
     filterStatus: RequestStatus | null,
     page: number
 ): Promise<{ items: RequestDocument[]; totItems: number } | Error> => {
     try {
         await connectDB();
-        // sort before paginating results to ensure results are sorted
-        // by created date in descending order
+
         const itemRequestsQuery = Request.find({
             ...(filterStatus && { status: filterStatus }),
         });
 
         const totItemRequests = await itemRequestsQuery.countDocuments();
-
+        // sort before paginating results to ensure results are correctly
+        // sorted in descending order
         const itemRequests = await Request.find({
             ...(filterStatus && { status: filterStatus }),
         })

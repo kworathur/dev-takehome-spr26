@@ -8,6 +8,11 @@ import getItemRequests from '@/server/mongodb/actions/getItemRequests';
 import { PAGINATION_PAGE_SIZE } from '@/lib/constants/config';
 import updateItemRequest from '@/server/mongodb/actions/updateItemRequest';
 
+/**
+ * Return a list of item requests
+ * @param request containing query parameters
+ * @returns paginated list of item requests
+ */
 export async function GET(request: Request) {
     const url = new URL(request.url);
     const status = url.searchParams.get('status') as string | null;
@@ -69,6 +74,11 @@ export async function GET(request: Request) {
     }
 }
 
+/**
+ * Create a new item request
+ * @param request containing item request fields in payload
+ * @returns 200 if request is succesfully created
+ */
 export async function PUT(request: Request) {
     try {
         const data = await request.json();
@@ -94,7 +104,11 @@ export async function PUT(request: Request) {
         return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR).build();
     }
 }
-
+/**
+ * Update an existing item request.
+ * @param request containing fields to update the item request with
+ * @returns updated item request data
+ */
 export async function PATCH(request: Request) {
     try {
         const data = await request.json();
